@@ -27,7 +27,6 @@ class IONeuron:
         du = (-self.u + (self.v - self.v_rest)) * (self.dt / self.tau_u)
         self.u += du
 
-        # Spike mechanism
         if self.v >= self.v_th:
             self.v = self.v_reset
             if len(self.spikes) == 0 or self.spikes[-1] != t:
@@ -52,7 +51,6 @@ class PurkinjeCell:
         elif delta_t > null_window:
             # LTP
             self.w += eta_ltp * (1 - self.w)
-        # else: null window
 
         self.w = np.clip(self.w, 0.0, 1.0)
-        self.history.append(self.w) 
+        self.history.append(self.w)

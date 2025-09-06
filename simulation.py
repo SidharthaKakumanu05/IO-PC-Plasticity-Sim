@@ -10,7 +10,6 @@ def run_network(n_io=20, g_c=1e-9, tau_u=200e-3, g_u=0.5,
     io_neurons = [IONeuron(dt=dt, tau_u=tau_u, g_u=g_u) for _ in range(n_io)]
     pc = PurkinjeCell()
 
-    # PF spikes (Poisson)
     pf_spikes = time[np.random.rand(len(time)) < pf_rate*dt]
     io_voltages = [[] for _ in range(n_io)]
     io_spike_trains = [[] for _ in range(n_io)]
@@ -28,9 +27,20 @@ def run_network(n_io=20, g_c=1e-9, tau_u=200e-3, g_u=0.5,
                 io_spike_trains[i].append(t)
                 cf_spikes.append(t)
 
-        # Plasticity update for PF spikes near CF events
         for pf in pf_spikes:
             if abs(pf - t) < 0.01:
                 pc.apply_plasticity(pf, cf_spikes)
 
     return time, io_voltages, io_spike_trains, pf_spikes, pc.history
+
+
+def measure_frequency(signal, dt, fmax=20):
+    """
+    Return dominant frequency of a voltage trace via FFT.
+    """
+    N = len(signal)
+    freqs = np.fft.rfftfreq(N, d=dt)
+    fft_vals = np.fft.rfft(signal - np.mean(signal))
+    power = np.abs(fft_vals)**2
+    valid = (freqs > 0.1) & (freqs < fmax)
+    return freqs[valid][np.argmax(power[valid])]

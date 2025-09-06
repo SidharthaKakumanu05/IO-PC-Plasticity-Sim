@@ -2,12 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 def plot_io_activity(time, io_voltages, io_spike_trains, pf_spikes, n_plot=5):
-    """
-    Plot IO voltage traces and raster plot of IO (CF) and PF spikes.
-    """
     plt.figure(figsize=(10,7))
-
-    # Voltage of first few IO neurons
     for i in range(min(n_plot, len(io_voltages))):
         plt.plot(time, io_voltages[i], label=f"IO {i}")
     plt.xlabel("Time (s)")
@@ -17,7 +12,6 @@ def plot_io_activity(time, io_voltages, io_spike_trains, pf_spikes, n_plot=5):
     plt.tight_layout()
     plt.show()
 
-    # Raster plot
     plt.figure(figsize=(10,6))
     for i, spikes in enumerate(io_spike_trains):
         plt.scatter(spikes, [i]*len(spikes), marker='|', color='red')
@@ -36,5 +30,28 @@ def plot_pc_weights(weights):
     plt.xlabel("Update step")
     plt.ylabel("Synaptic Weight")
     plt.title("Purkinje Synaptic Weight Evolution (PF→PC)")
+    plt.tight_layout()
+    plt.show()
+
+
+def plot_sweep(results, param_name="tau_u"):
+    plt.figure(figsize=(10,5))
+
+    params = [p for p in results.keys()]
+    freqs = [val[0] for val in results.values()]
+    final_w = [val[1] for val in results.values()]
+
+    plt.subplot(1,2,1)
+    plt.plot(params, freqs, marker='o')
+    plt.xlabel(param_name)
+    plt.ylabel("Emergent IO Frequency (Hz)")
+    plt.title("Frequency vs " + param_name)
+
+    plt.subplot(1,2,2)
+    plt.plot(params, final_w, marker='s', color="green")
+    plt.xlabel(param_name)
+    plt.ylabel("Final Synaptic Weight")
+    plt.title("Plasticity vs " + param_name)
+
     plt.tight_layout()
     plt.show()
